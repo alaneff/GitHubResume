@@ -24,12 +24,6 @@
 
 ################################### AD 2008 R2 Domain COMMANDS ######################
 
-# Quick script to search for services configured for the specified user
-# $Service = read-host 'What account are your searching for? Put in domain\username format.'
-# $Computers = Get-ADComputer -Filter "operatingsystem -like '*server*'"
-# foreach ($i in $Computers) 
-# {get-wmiobject Win32_Service -ComputerName $i.Name -ErrorAction SilentlyContinue | where-object {$_.StartName -eq "$service" } | format-table $i.Name, Name, StartName, State}
-
 ## Various user related commands ##
 # $user = "CN=Users Name,OU=Users,OU=MyBusiness,DC=DOMAIN,DC=COM"
 # Set-ADUser -Identity $user -ChangePasswordAtLogon $true ## Requires user to change password at next login
@@ -37,3 +31,77 @@
 # Set-ADAccountPassword -Identity $user -Reset -NewPassword (ConvertTo-SecureString -AsPlainText "password" -Force) ## Reset User PW
 
 
+################################### Windows Server COMMANDS ######################
+
+# Pulls process ID of any services stuck in stopping
+# get-wmiobject -Class win32_service | Where-Object {$_.state -eq 'stop pending'} 
+
+# Kill a process/service & any dependents
+# pskill -t PID 
+
+# Quick script to search for services configured for the specified user
+# $Service = read-host 'What account are your searching for? Put in domain\username format.'
+# $Computers = Get-ADComputer -Filter "operatingsystem -like '*server*'"
+# foreach ($i in $Computers) 
+# {get-wmiobject Win32_Service -ComputerName $i.Name -ErrorAction SilentlyContinue | where-object {$_.StartName -eq "$service" } | format-table $i.Name, Name, StartName, State}
+
+################################### Misc PowerShell Notes ######################
+
+## Get-PSProvider - Get data services (Most support -Whatif command).  Can see the different portions of a windows environment using this.
+## Get-PSDrive - Shows currently mapped data services
+## Set-Location - Change to a specific drive
+## Get-ChildItem - Shows a list of available items
+## Get-Service - Gets a list of services
+## Get-Process - Gets a list of processes
+## Get-EventLog - Get the idea?
+## Export-CSV - Exports data to a csv
+## Export-CliXML - Exports to XML format, you can use import-CliXML with compare-object (or diff) to create baselines
+## Compare-Object - Compares two seperate items
+## ConvertTo-XML/HTML/CSV - Will convert the output to these, though in order to create a file you still need to use the Out-file command
+## Get-PSSnapin -registered -- Gives a list of all available PS snapins; many of the times will add a new data provider
+## Get-Member - Gives a list of all types of properties and methods from a command
+## Sort-Object -property -- allows you to sort by property
+## Select-Object -property -- allows you to choose the various properties in a report, when the property selected is * can be used with hash tables.
+## Where-Object -filter {$_.PROPERTY -eq 'text'} -- used to filter objects/properties.  
+## Measure-Object - Can use to calculate sums
+## Can be used with -expand PROPERTY ; this will provide a list of that specific property back (helpful in piping commands) and in String format
+## Out-file -exports to a file
+## Get-Content - Imports data from a file
+
+
+## Remoting
+## Requires the WS-MAN or WINRM services to be available
+## Enable-PSRemoting -force will enable PS Remoting
+## Enter-PSSession -computername COMPUTER one-one remoting // Exit-PSSession to exit
+## Invoke-Command -computerName COMPUTERS,2,3 -command {PS Command} // Allows you to run commands across multiple computers
+
+## Hash Tables:
+## @{name='samAccountName';expression={$_.login}}
+## @{} specifies the hash table, name is what you want the new object property to be named, and expression={$_.item} is where the data is being pulled from. 
+## "$_." pulls data from the existing piped in object
+
+## Piping commands:
+## ByValue: Will try to match up the type of input (can see byvalue using both GM and looking at detailed help).  Is a 1to1 relationship.
+## ByProperty: Sometimes ByValue doesn't work. Checks if property names on an object match up to the parameter names of the command being piped into.  Is a 1tomany relationship.
+## Parenthesis trick: Put the command pulling the data in paranthesis and place it into the proper place in the command.  Must be outputting exactly what that parameter is expecting.
+
+## Filtering and Comparison
+## Putting a c in front of any of the below makes it case sensitive as well, so -ceq would be Case sensitive equals
+## -eq Equals
+## -ne Not Equals
+## -ge Greater than or equal
+## -le Less than or equal
+## -gt Greater than
+## -lt Less than
+## "$_.PROPERTYNAME" pulls data from the existing piped in object
+## -and (boolean operator...)
+## -or
+## -not (makes false true)
+## -like or -notlike allows for the use of wildcards
+## -match -notmatch For regular expressions (advanced search techniques)
+
+## Terminology:
+## Object—This is what we’ve been calling a “table row.” It represents a single thing, like a single process or a single service.
+## Property—This is what we called a “table column.” It represents one piece of information about an object, like a process name, process ID, or service status.
+## Method—This is what we called an “action.” A method is related to a single object and makes that object do something, like killing a process or starting a service.
+## Collection—This is the entire set of objects, or what we’ve been calling a “table.”
