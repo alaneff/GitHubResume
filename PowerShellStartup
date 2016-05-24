@@ -1,0 +1,21 @@
+#################################################################################
+# This section sets up implicit remoting of misc items
+#################################################################################
+
+# Administrator Credentials #
+$adminCred = Get-Credential -Credential domain\administratorusername
+
+# Exchange #
+$exchangeSession = new-pssession -ConfigurationName Microsoft.Exchange 
+	-ConnectionUri http://ExchangeFQDN/powershell -Credential $adminCred
+Import-PSSession $exchangeSession 
+
+# Active Directory #
+$ADSession = new-pssession -comp ADFQDN -Credential $adminCred
+invoke-command -command { import-module activedirectory } -session $ADSession
+import-pssession -session $ADSession -module activedirectory 
+
+# Sharepoint #
+$s=new-PSsession -comp sharepointFQDN -credential $adminCred
+Invoke-Command -Session $s -ScriptBlock {Add-PSSnapin Microsoft.SharePoint.PowerShell;}
+import-pssession -session $s
