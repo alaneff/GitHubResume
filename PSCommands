@@ -1,0 +1,39 @@
+################################### EXCHANGE 2013 COMMANDS ######################
+
+# Search Exchange Logs (requires the Exchange Transport Log Search service to be started)
+# Get-MessageTrackingLog -ResultSize Unlimited -Start "3/15/2016 5:00AM" -End "3/15/2016 8:00AM" -Recipient e@mail.com"
+
+# Import a pst into Exchange
+# New-MailboxImportRequest -Mailbox username -FilePath "\\UNC\share\Archive.pst" -TargetRootFolder "Imported Files" 
+
+# Custom Quota Default Sizes
+# Set-Mailbox -Identity emailaddress -IssueWarningQuota 26244635648 -ProhibitSendQuota 30242880000 -ProhibitSendReceiveQuota 30242880000 -UseDatabaseQuotaDefaults $false 
+
+# Add a device to the internal SMTP Receive Connector
+# $RecvConn = Get-ReceiveConnector "ExchangeServer\RelayName" 
+# $RecvConn.RemoteIPRanges += "IPAddressToAdd"
+# set-receiveconnector $RecvConn -RemoteIPRanges $RecvConn.RemoteIPRanges
+
+# Create a mailbox for an existing AD User
+# Enable-Mailbox -Identity:"domain.com/OUPATH/ADObjectName" -Alias:useralias -Database:"Mailbox Database Name"
+
+# Add a user to a group of distribution groups (using a loop)
+# $group = Get-DistributionGroup *ImportListofGroups* | Select-Object Name
+# foreach ($g in $group)
+# {Add-DistributionGroupMember -Identity $g.Name -Member "EmailToAddToGroups"}
+
+################################### AD 2008 R2 Domain COMMANDS ######################
+
+# Quick script to search for services configured for the specified user
+# $Service = read-host 'What account are your searching for? Put in domain\username format.'
+# $Computers = Get-ADComputer -Filter "operatingsystem -like '*server*'"
+# foreach ($i in $Computers) 
+# {get-wmiobject Win32_Service -ComputerName $i.Name -ErrorAction SilentlyContinue | where-object {$_.StartName -eq "$service" } | format-table $i.Name, Name, StartName, State}
+
+## Various user related commands ##
+# $user = "CN=Users Name,OU=Users,OU=MyBusiness,DC=DOMAIN,DC=COM"
+# Set-ADUser -Identity $user -ChangePasswordAtLogon $true ## Requires user to change password at next login
+# Unlock-ADAccount -Identity $user ## Unlocks AD Account
+# Set-ADAccountPassword -Identity $user -Reset -NewPassword (ConvertTo-SecureString -AsPlainText "password" -Force) ## Reset User PW
+
+
