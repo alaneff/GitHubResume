@@ -38,7 +38,7 @@ foreach ($i in $dglist)
 }
 
 # Searches to see what distribution groups a user is in, then removes the user from the groups
-$user = "Leslie Clark"
+$user = "Put username here"
 $dglist = get-distributiongroup 
 foreach ($i in $dglist)
 {
